@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Secrets — never commit real credentials
+.env
+
+# Hardhat build output
+cache/
+artifacts/
+
+# Hardhat / coverage artifacts
+coverage/
+coverage.json
+typechain/
+typechain-types/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
