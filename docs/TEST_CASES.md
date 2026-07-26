@@ -8,7 +8,7 @@ result**, and its **actual result**.
   ethers.js v6).
 - **Source of tests:** `test/SupplyChainRegistry.test.js`.
 - **How to run:** `npx hardhat test` (or `npm test`).
-- **Overall result:** **28 passing (977 ms).** Every case's actual result
+- **Overall result:** **29 passing.** Every case's actual result
   matches its expected result.
 
 ---
@@ -71,16 +71,17 @@ Enum mirrors used in the tests:
 
 | # | Test | Input / Preconditions | Expected result | Actual |
 |---|------|-----------------------|-----------------|--------|
-| 16 | advances the stage by one and moves custody, emitting an event | Holder (manufacturer) calls `transferCustody(1, distributor, Manufactured)` | `currentHolder == distributor`, `stage == Manufactured`; emits `CustodyTransferred(1, manufacturer, distributor, Manufactured)` | ✔ Pass |
+| 16 | advances the stage by one and records custody, emitting an event | Holder moves `Created -> Manufactured` with manufacturer custody, then `Manufactured -> InTransit` to distributor | `currentHolder == distributor`, `stage == InTransit`; emits matching `CustodyTransferred` events | ✔ Pass |
 | 17 | appends a record to the provenance trail on each transfer | One transfer performed | `getHistory(1)` length grows from `1` to `2`; last record matches new holder/stage | ✔ Pass |
 | 18 | supports the full lifecycle to Sold | Sequential transfers Created→Manufactured→InTransit→Delivered→Sold | Each step succeeds; final `stage == Sold`; history length `5` | ✔ Pass |
 | 19 | reverts when a non-holder tries to transfer | `outsider` (not current holder) calls `transferCustody(...)` | Reverts with `"Only current holder"` | ✔ Pass |
 | 20 | reverts when skipping a stage | Holder calls `transferCustody(1, distributor, InTransit)` from `Created` | Reverts with `"Stage must advance by one"` | ✔ Pass |
 | 21 | reverts when moving a stage backward | Advance to `Manufactured`, then attempt `Created` | Reverts with `"Stage must advance by one"` | ✔ Pass |
-| 22 | reverts when the recipient is not a registered participant | Holder transfers to `outsider` (role None) | Reverts with `"Recipient not a participant"` | ✔ Pass |
-| 23 | reverts when the recipient is the zero address | Holder calls `transferCustody(1, 0x0, Manufactured)` | Reverts with `"Zero address"` | ✔ Pass |
-| 24 | reverts when transferring a product that is already Sold | Product advanced to `Sold`, then another transfer attempted | Reverts with `"Product already sold"` | ✔ Pass |
-| 25 | reverts when the product does not exist | `transferCustody(999, ...)` on unregistered id | Reverts with `"Product does not exist"` | ✔ Pass |
+| 22 | reverts when the recipient role does not match the new stage | Manufacturer attempts `Manufactured` custody to distributor, then `InTransit` custody to retailer | Reverts with `"Recipient role does not match stage"` | ✔ Pass |
+| 23 | reverts when the recipient is not a registered participant | Holder transfers to `outsider` (role None) | Reverts with `"Recipient not a participant"` | ✔ Pass |
+| 24 | reverts when the recipient is the zero address | Holder calls `transferCustody(1, 0x0, Manufactured)` | Reverts with `"Zero address"` | ✔ Pass |
+| 25 | reverts when transferring a product that is already Sold | Product advanced to `Sold`, then another transfer attempted | Reverts with `"Product already sold"` | ✔ Pass |
+| 26 | reverts when the product does not exist | `transferCustody(999, ...)` on unregistered id | Reverts with `"Product does not exist"` | ✔ Pass |
 
 ---
 
@@ -88,9 +89,9 @@ Enum mirrors used in the tests:
 
 | # | Test | Input / Preconditions | Expected result | Actual |
 |---|------|-----------------------|-----------------|--------|
-| 26 | verifyAuthenticity returns true for the real manufacturer | Product 1 registered by manufacturer | `verifyAuthenticity(1, manufacturer) == true` | ✔ Pass |
-| 27 | verifyAuthenticity returns false for an impostor | Product 1 registered by manufacturer | `verifyAuthenticity(1, outsider) == false` | ✔ Pass |
-| 28 | reverts view calls for a non-existent product | `getProduct(999)` on unregistered id | Reverts with `"Product does not exist"` | ✔ Pass |
+| 27 | verifyAuthenticity returns true for the real manufacturer | Product 1 registered by manufacturer | `verifyAuthenticity(1, manufacturer) == true` | ✔ Pass |
+| 28 | verifyAuthenticity returns false for an impostor | Product 1 registered by manufacturer | `verifyAuthenticity(1, outsider) == false` | ✔ Pass |
+| 29 | reverts view calls for a non-existent product | `getProduct(999)` on unregistered id | Reverts with `"Product does not exist"` | ✔ Pass |
 
 ---
 
@@ -101,7 +102,7 @@ The verbatim output of `npx hardhat test`:
 ```
   SupplyChainRegistry
     Deployment
-      ✔ sets the deployer as admin (924ms)
+      ✔ sets the deployer as admin
       ✔ starts with a product count of zero
     Participant management
       ✔ lets the admin register a participant and emits an event
@@ -119,12 +120,13 @@ The verbatim output of `npx hardhat test`:
       ✔ reverts when the product name is empty
       ✔ seeds the provenance trail with the manufacturer's initial custody
     Custody transfer
-      ✔ advances the stage by one and moves custody, emitting an event
+      ✔ advances the stage by one and records custody, emitting an event
       ✔ appends a record to the provenance trail on each transfer
       ✔ supports the full lifecycle to Sold
       ✔ reverts when a non-holder tries to transfer
       ✔ reverts when skipping a stage
       ✔ reverts when moving a stage backward
+      ✔ reverts when the recipient role does not match the new stage
       ✔ reverts when the recipient is not a registered participant
       ✔ reverts when the recipient is the zero address
       ✔ reverts when transferring a product that is already Sold
@@ -134,7 +136,7 @@ The verbatim output of `npx hardhat test`:
       ✔ verifyAuthenticity returns false for an impostor
       ✔ reverts view calls for a non-existent product
 
-  28 passing (977ms)
+  29 passing
 ```
 
 ---
@@ -166,10 +168,11 @@ Admin (deployer)               : 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 | Deployment / initial state | 2 | ✔ All pass |
 | Participant management (access control) | 7 | ✔ All pass |
 | Product registration | 6 | ✔ All pass |
-| Custody transfer (lifecycle + guards) | 10 | ✔ All pass |
+| Custody transfer (lifecycle + guards) | 11 | ✔ All pass |
 | Views & authenticity verification | 3 | ✔ All pass |
-| **Total** | **28** | **✔ 28 passing** |
+| **Total** | **29** | **✔ 29 passing** |
 
 Every happy path and every guard clause (access control, input validation,
-lifecycle ordering, existence checks) is exercised, giving confidence the
-contract enforces its intended rules before any gas is spent on Sepolia.
+lifecycle ordering, stage-to-role custody semantics, existence checks) is
+exercised, giving confidence the contract enforces its intended rules before any
+gas is spent on Sepolia.

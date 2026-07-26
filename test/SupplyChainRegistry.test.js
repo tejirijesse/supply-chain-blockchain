@@ -252,32 +252,45 @@ describe("SupplyChainRegistry", function () {
       return base;
     }
 
-    it("advances the stage by one and moves custody, emitting an event", async function () {
+    it("advances the stage by one and records custody, emitting an event", async function () {
       const { registry, manufacturer, distributor } = await productFixture();
 
       await expect(
         registry
           .connect(manufacturer)
-          .transferCustody(1, distributor.address, Stage.Manufactured)
+          .transferCustody(1, manufacturer.address, Stage.Manufactured)
       )
         .to.emit(registry, "CustodyTransferred")
-        .withArgs(1, manufacturer.address, distributor.address, Stage.Manufactured);
+        .withArgs(
+          1,
+          manufacturer.address,
+          manufacturer.address,
+          Stage.Manufactured
+        );
+
+      await expect(
+        registry
+          .connect(manufacturer)
+          .transferCustody(1, distributor.address, Stage.InTransit)
+      )
+        .to.emit(registry, "CustodyTransferred")
+        .withArgs(1, manufacturer.address, distributor.address, Stage.InTransit);
 
       const p = await registry.getProduct(1);
       expect(p.currentHolder).to.equal(distributor.address);
-      expect(p.stage).to.equal(Stage.Manufactured);
+      expect(p.stage).to.equal(Stage.InTransit);
     });
 
     it("appends a record to the provenance trail on each transfer", async function () {
-      const { registry, manufacturer, distributor } = await productFixture();
+      const { registry, manufacturer } = await productFixture();
 
       await registry
         .connect(manufacturer)
-        .transferCustody(1, distributor.address, Stage.Manufactured);
+        .transferCustody(1, manufacturer.address, Stage.Manufactured);
 
       expect(await registry.getHistoryLength(1)).to.equal(2);
       const history = await registry.getHistory(1);
-      expect(history[1].holder).to.equal(distributor.address);
+      expect(history[1].holder).to.equal(manufacturer.address);
       expect(history[1].stage).to.equal(Stage.Manufactured);
     });
 
@@ -287,9 +300,9 @@ describe("SupplyChainRegistry", function () {
 
       await registry
         .connect(manufacturer)
-        .transferCustody(1, distributor.address, Stage.Manufactured);
+        .transferCustody(1, manufacturer.address, Stage.Manufactured);
       await registry
-        .connect(distributor)
+        .connect(manufacturer)
         .transferCustody(1, distributor.address, Stage.InTransit);
       await registry
         .connect(distributor)
@@ -329,13 +342,34 @@ describe("SupplyChainRegistry", function () {
       // First advance to Manufactured, then attempt to go back to Created.
       await registry
         .connect(manufacturer)
-        .transferCustody(1, distributor.address, Stage.Manufactured);
+        .transferCustody(1, manufacturer.address, Stage.Manufactured);
 
       await expect(
         registry
-          .connect(distributor)
+          .connect(manufacturer)
           .transferCustody(1, distributor.address, Stage.Created)
       ).to.be.revertedWith("Stage must advance by one");
+    });
+
+    it("reverts when the recipient role does not match the new stage", async function () {
+      const { registry, manufacturer, distributor, retailer } =
+        await productFixture();
+
+      await expect(
+        registry
+          .connect(manufacturer)
+          .transferCustody(1, distributor.address, Stage.Manufactured)
+      ).to.be.revertedWith("Recipient role does not match stage");
+
+      await registry
+        .connect(manufacturer)
+        .transferCustody(1, manufacturer.address, Stage.Manufactured);
+
+      await expect(
+        registry
+          .connect(manufacturer)
+          .transferCustody(1, retailer.address, Stage.InTransit)
+      ).to.be.revertedWith("Recipient role does not match stage");
     });
 
     it("reverts when the recipient is not a registered participant", async function () {
@@ -365,9 +399,9 @@ describe("SupplyChainRegistry", function () {
       // Walk the product all the way to Sold.
       await registry
         .connect(manufacturer)
-        .transferCustody(1, distributor.address, Stage.Manufactured);
+        .transferCustody(1, manufacturer.address, Stage.Manufactured);
       await registry
-        .connect(distributor)
+        .connect(manufacturer)
         .transferCustody(1, distributor.address, Stage.InTransit);
       await registry
         .connect(distributor)

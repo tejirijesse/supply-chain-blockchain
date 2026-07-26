@@ -134,7 +134,7 @@ Confirm the contract behaves correctly before spending any gas:
 npx hardhat test
 ```
 
-Expected: **28 passing**. See `docs/TEST_CASES.md` for the full list of cases
+Expected: **29 passing**. See `docs/TEST_CASES.md` for the full list of cases
 and their expected/actual results.
 
 ---
@@ -222,6 +222,17 @@ Once deployed and verified, the typical flow to demonstrate the solution:
 You can do all of this from the Etherscan **Write Contract** / **Read
 Contract** tabs, or from a dApp/script using ethers.js.
 
+For a fast local demonstration without manual contract calls, run:
+
+```bash
+npm run demo:local
+```
+
+The demo deploys the contract on Hardhat's in-memory network, registers the
+three participants, moves an "Organic Coffee" product through the full
+lifecycle, prints the provenance trail, and shows authenticity checks returning
+`true` for the real manufacturer and `false` for an impostor.
+
 ---
 
 ## Quick command reference
@@ -231,6 +242,7 @@ Contract** tabs, or from a dApp/script using ethers.js.
 | Install dependencies | `npm install` |
 | Compile | `npx hardhat compile` |
 | Test | `npx hardhat test` |
+| Demo (local) | `npm run demo:local` |
 | Deploy (local) | `npx hardhat run scripts/deploy.js --network hardhat` |
 | Deploy (Sepolia) | `npx hardhat run scripts/deploy.js --network sepolia` |
 | Verify (Sepolia) | `npx hardhat verify --network sepolia <ADDRESS>` |

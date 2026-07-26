@@ -226,6 +226,8 @@ contract SupplyChainRegistry {
      *         - `newStage` must be exactly one greater than the current stage
      *           (no skipping and no moving backward).
      *         - A product in the terminal `Sold` stage cannot be transferred.
+     *         - The receiving address must hold the role expected for the new
+     *           lifecycle stage, preserving real-world custody semantics.
      * @param productId Product to transfer.
      * @param to Address receiving custody (must be a registered participant).
      * @param newStage The next lifecycle stage.
@@ -245,6 +247,10 @@ contract SupplyChainRegistry {
             uint8(newStage) == uint8(p.stage) + 1,
             "Stage must advance by one"
         );
+        require(
+            roles[to] == expectedRoleForStage(newStage),
+            "Recipient role does not match stage"
+        );
 
         address from = p.currentHolder;
         p.currentHolder = to;
@@ -259,6 +265,23 @@ contract SupplyChainRegistry {
         );
 
         emit CustodyTransferred(productId, from, to, newStage);
+    }
+
+    /**
+     * @dev Maps each post-creation lifecycle stage to the participant role that
+     *      should hold custody at that point.
+     */
+    function expectedRoleForStage(Stage stage) internal pure returns (Role) {
+        if (stage == Stage.Manufactured) {
+            return Role.Manufacturer;
+        }
+        if (stage == Stage.InTransit) {
+            return Role.Distributor;
+        }
+        if (stage == Stage.Delivered || stage == Stage.Sold) {
+            return Role.Retailer;
+        }
+        return Role.None;
     }
 
     // -------------------------------------------------------------------------

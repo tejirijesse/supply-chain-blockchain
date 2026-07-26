@@ -168,16 +168,16 @@ before writing — best-practice checks-then-effects ordering.
 
 ## Slide 11 — Testing
 
-### 28 automated tests — all passing
+### 29 automated tests — all passing
 
 | Area | Cases | Result |
 |------|-------|--------|
 | Deployment / initial state | 2 | ✔ |
 | Participant management | 7 | ✔ |
 | Product registration | 6 | ✔ |
-| Custody transfer (lifecycle + guards) | 10 | ✔ |
+| Custody transfer (lifecycle + guards) | 11 | ✔ |
 | Views & authenticity | 3 | ✔ |
-| **Total** | **28** | **✔ 28 passing (977 ms)** |
+| **Total** | **29** | **✔ 29 passing** |
 
 Every happy path **and** every guard clause is exercised.
 
@@ -191,11 +191,12 @@ expected-vs-actual mapping is in `docs/TEST_CASES.md`.
 ### From code to verified on-chain contract
 
 1. `npm install` → `npx hardhat compile`
-2. `npx hardhat test` → **28 passing**
-3. Local dry-run: `hardhat run scripts/deploy.js --network hardhat`
-4. Fund throwaway wallet from a Sepolia faucet
-5. `hardhat run scripts/deploy.js --network sepolia`
-6. `hardhat verify --network sepolia <ADDRESS>` → public, auditable source
+2. `npx hardhat test` → **29 passing**
+3. Local demo: `npm run demo:local`
+4. Local deploy dry-run: `hardhat run scripts/deploy.js --network hardhat`
+5. Fund throwaway wallet from a Sepolia faucet
+6. `hardhat run scripts/deploy.js --network sepolia`
+7. `hardhat verify --network sepolia <ADDRESS>` → public, auditable source
 
 **Notes:** The deploy script prints the deployer, balance, deployed address, and
 a ready-to-run verify command. Full guide in `docs/DEPLOYMENT_GUIDE.md`.
@@ -208,7 +209,8 @@ a ready-to-run verify command. Full guide in `docs/DEPLOYMENT_GUIDE.md`.
 
 1. **Admin** registers a manufacturer, distributor, retailer.
 2. **Manufacturer** registers "Organic Coffee" / "Batch #A1" → product id 1.
-3. Custody moves Created → Manufactured → InTransit → Delivered → Sold.
+3. Custody moves Created → Manufactured → InTransit → Delivered → Sold, with
+   each stage held by the correct participant role.
 4. **Anyone** calls `getHistory(1)` to see the full trail, and
    `verifyAuthenticity(1, manufacturer)` → **true**; an impostor → **false**.
 
@@ -224,7 +226,8 @@ grow and the authenticity check succeed, then fail for a fake.
 - ✅ Tamper-proof, append-only provenance for every product.
 - ✅ Independent, public authenticity verification.
 - ✅ Role-gated actions — no unauthorized writes.
-- ✅ Fully tested (28/28) and deployable to a live testnet.
+- ✅ Stage-to-role validation for realistic custody semantics.
+- ✅ Fully tested (29/29) and deployable to a live testnet.
 
 **Transparency & Trust — enforced by code, not by promises.**
 
@@ -254,8 +257,8 @@ credible roadmap.
 ### What's in the submission
 
 - **Contract:** `contracts/SupplyChainRegistry.sol` (commented, secured).
-- **Tests:** `test/SupplyChainRegistry.test.js` — 28 passing.
-- **Deploy:** `scripts/deploy.js` (local + Sepolia).
+- **Tests:** `test/SupplyChainRegistry.test.js` — 29 passing.
+- **Demo/Deploy:** `scripts/demo.js` and `scripts/deploy.js`.
 - **Docs:** Project Report, Deployment Guide, Test Cases, this Presentation.
 
 **Thank you — questions welcome.**

@@ -39,7 +39,7 @@ The core deliverable is `SupplyChainRegistry`, a Solidity smart contract that:
 - lets **anyone** independently audit a product's origin, full chain of custody,
   and authenticity.
 
-The contract is developed and tested with **Hardhat**, covered by **28
+The contract is developed and tested with **Hardhat**, covered by **29
 automated tests (all passing)**, and is deployable to the **Ethereum Sepolia
 testnet** with a single scripted command plus Etherscan source verification.
 
@@ -145,6 +145,9 @@ tamper-evident.
 - **Least privilege** — actions are gated to the narrowest role that should be
   able to perform them (only the admin manages participants; only manufacturers
   create products; only the current holder can transfer custody).
+- **Business-rule integrity** — each lifecycle stage must be held by the role
+  expected in the real supply chain: manufacturer for production, distributor
+  for transit, and retailer for delivery/sale.
 - **Fail-fast validation** — every state-changing function validates its inputs
   and reverts with a clear message rather than proceeding on bad data.
 - **Auditability first** — every state change emits an event, giving off-chain
@@ -222,6 +225,8 @@ function transferCustody(uint256 productId, address to, Stage newStage)
     require(roles[to] != Role.None, "Recipient not a participant");
     require(p.stage != Stage.Sold, "Product already sold");
     require(uint8(newStage) == uint8(p.stage) + 1, "Stage must advance by one");
+    require(roles[to] == expectedRoleForStage(newStage),
+            "Recipient role does not match stage");
     ...
     emit CustodyTransferred(productId, from, to, newStage);
 }
@@ -230,7 +235,9 @@ function transferCustody(uint256 productId, address to, Stage newStage)
 This single function enforces the entire integrity model: only the holder can
 move a product; the recipient must be a registered participant; a sold product
 is frozen; and the stage can only advance by exactly one step — no skipping and
-no going backward.
+no going backward. The recipient must also have the role expected for the new
+stage, so a distributor cannot mark an item manufactured and a retailer cannot
+receive a product while it is still in transit.
 
 ### 5.5 Views & verification (open to everyone)
 
@@ -252,6 +259,7 @@ clearly rather than returning misleading empty data.
 | `immutable admin` | Fixes the trust anchor; cannot be hijacked post-deploy. |
 | `productExists` guard | Blocks operations on non-existent products. |
 | Forward-only stage check | Makes history append-only / tamper-evident. |
+| Stage-to-role validation | Preserves real-world custody semantics at each lifecycle step. |
 | "Current holder only" transfer rule | Prevents third parties from moving goods they don't hold. |
 | Zero-address & empty-input checks | Reject malformed or accidental input. |
 | Solidity 0.8 checked arithmetic | Eliminates overflow/underflow bugs. |
@@ -315,13 +323,13 @@ and full end-to-end lifecycle.
 
 ### 7.2 Results
 
-**All 28 tests pass.** The suite spans five areas: Deployment, Participant
+**All 29 tests pass.** The suite spans five areas: Deployment, Participant
 management, Product registration, Custody transfer, and Views & verification.
 See `docs/TEST_CASES.md` for the full case-by-case table of inputs, expected
 results, and actual results.
 
 ```
-  28 passing
+  29 passing
 ```
 
 Representative cases:
@@ -331,6 +339,7 @@ Representative cases:
 - ✔ lets a manufacturer register a product and emits an event
 - ✔ supports the full lifecycle to Sold
 - ✔ reverts when skipping a stage / moving a stage backward
+- ✔ reverts when a recipient's role does not match the requested stage
 - ✔ reverts when transferring a product that is already Sold
 - ✔ verifyAuthenticity returns true for the real manufacturer / false for an impostor
 
@@ -357,7 +366,7 @@ step-by-step in `docs/DEPLOYMENT_GUIDE.md`. In summary:
 1. Install dependencies (`npm install`).
 2. Provide a Sepolia RPC URL (Infura/Alchemy), a funded throwaway wallet key,
    and an Etherscan API key in `.env`.
-3. `npx hardhat compile` → `npx hardhat test` (28 passing).
+3. `npx hardhat compile` → `npx hardhat test` (29 passing).
 4. `npx hardhat run scripts/deploy.js --network sepolia` → prints the live
    contract address.
 5. `npx hardhat verify --network sepolia <ADDRESS>` → publishes the source on
@@ -401,5 +410,5 @@ contract can address a real and costly problem — counterfeiting and supply-cha
 opacity — directly in service of a **Transparency & Trust** mission. By recording
 provenance immutably, enforcing least-privilege access, and exposing open
 verification functions, the solution replaces "trust the seller" with "verify on
-the ledger". It is fully implemented, comprehensively tested (28 passing tests),
+the ledger". It is fully implemented, comprehensively tested (29 passing tests),
 and ready to deploy and verify on the Ethereum Sepolia testnet.
