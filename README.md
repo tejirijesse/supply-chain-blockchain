@@ -69,7 +69,7 @@ Created -> Manufactured -> InTransit -> Delivered -> Sold
 
 ## Quick start
 
-Use Node.js 20 LTS for the cleanest Hardhat experience:
+Use Node.js 22 LTS for the cleanest Hardhat experience:
 
 ```bash
 nvm use
@@ -109,4 +109,3 @@ See `docs/DEPLOYMENT_GUIDE.md` for the full step-by-step process.
 - Automated tests cover happy paths, failure paths, and view functions
 - Local deployment and demo scripts provided
 - Deployment and presentation documentation included
-

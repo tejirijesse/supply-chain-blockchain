@@ -15,16 +15,17 @@ Install these before you begin:
 
 | Tool | Version | Purpose | Where to get it |
 |------|---------|---------|-----------------|
-| **Node.js** | 18 LTS or 20 LTS (recommended) | Runs Hardhat and npm | https://nodejs.org |
+| **Node.js** | 22 LTS (recommended) | Runs Hardhat and npm | https://nodejs.org |
 | **npm** | Ships with Node.js | Installs project dependencies | (bundled) |
 | **Git** | any recent | Clone / manage the repo | https://git-scm.com |
 | **MetaMask** | latest | Provides the deploying wallet + private key | https://metamask.io |
 
-> **Note on Node.js version.** Hardhat officially supports the Active LTS
-> releases (18 / 20). Newer releases (e.g. Node 25) print
+> **Note on Node.js version.** Use the active LTS release pinned in `.nvmrc`
+> (`22`) for the cleanest Hardhat experience. Newer current releases
+> (e.g. Node 25) print
 > `WARNING: You are currently using Node.js vXX, which is not supported by
-> Hardhat.` The commands in this guide still run correctly, but for a clean,
-> supported setup use an LTS version (you can switch easily with `nvm`).
+> Hardhat.` The commands may still run, but a supported LTS version avoids
+> avoidable tooling surprises.
 
 Verify your install:
 
@@ -257,7 +258,7 @@ Convenience npm scripts (see `package.json`) wrap the common commands:
 
 | Symptom | Cause / Fix |
 |---------|-------------|
-| `Node.js vXX ... is not supported` warning | Informational. Use Node 18/20 LTS to silence it; commands still run. |
+| `Node.js vXX ... is not supported` warning | Use Node 22 LTS (`nvm use` reads `.nvmrc`) to silence it. |
 | `insufficient funds for gas` on Sepolia | Wallet has no/low test ETH — get more from a faucet (step 4). |
 | `invalid private key` / accounts empty | Ensure `PRIVATE_KEY` in `.env` has **no** `0x` prefix and no quotes issues. |
 | `SEPOLIA_RPC_URL` errors / timeouts | Check the RPC URL is correct and the provider project is active. |
