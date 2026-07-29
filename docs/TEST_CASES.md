@@ -91,7 +91,7 @@ Enum mirrors used in the tests:
 |---|------|-----------------------|-----------------|--------|
 | 27 | verifyAuthenticity returns true for the real manufacturer | Product 1 registered by manufacturer | `verifyAuthenticity(1, manufacturer) == true` | ✔ Pass |
 | 28 | verifyAuthenticity returns false for an impostor | Product 1 registered by manufacturer | `verifyAuthenticity(1, outsider) == false` | ✔ Pass |
-| 29 | reverts view calls for a non-existent product | `getProduct(999)` on unregistered id | Reverts with `"Product does not exist"` | ✔ Pass |
+| 29 | reverts view calls for a non-existent product | `getProduct(1)`, `getHistory(1)`, `getHistoryLength(1)`, and `verifyAuthenticity(1, 0x0)` on unregistered id `1` (no product registered in this fixture) | Each reverts with `"Product does not exist"` | ✔ Pass |
 
 ---
 
