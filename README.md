@@ -62,6 +62,7 @@ Created -> Manufactured -> InTransit -> Delivered -> Sold
 | `test/SupplyChainRegistry.test.js` | Automated Hardhat test suite |
 | `scripts/deploy.js` | Local/Sepolia deployment script |
 | `scripts/demo.js` | End-to-end local demo workflow |
+| `scripts/interact.js` | Sepolia participant-registration evidence script |
 | `docs/PROJECT_REPORT.md` | Full project report |
 | `docs/DEPLOYMENT_GUIDE.md` | Setup, testnet deployment, verification guide |
 | `docs/TEST_CASES.md` | Expected-vs-actual test case table |
@@ -93,6 +94,7 @@ Then run:
 
 ```bash
 npm run deploy:sepolia
+npm run interact:sepolia
 npm run verify -- <DEPLOYED_CONTRACT_ADDRESS>
 ```
 

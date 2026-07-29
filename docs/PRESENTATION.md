@@ -242,8 +242,10 @@ mechanism behind it.
 
 - **On/off-chain link:** on-chain proves the record, not the physical item —
   pair with tamper-evident QR/NFC tags.
-- **Admin centralisation:** single admin onboards participants — could move to
-  multi-sig / DAO governance.
+- **Admin & role changes:** single admin can update roles — production should
+  use multi-sig, timelocks, and clearer governance.
+- **Revoked participants:** revocation blocks future actions but keeps past
+  custody immutable — UIs should show historical versus current trust status.
 - **Branching custody:** current model is linear — extend for splits/recalls.
 - **Privacy:** all data is public — add commitments/ZK for sensitive fields.
 

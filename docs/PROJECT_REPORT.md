@@ -386,9 +386,17 @@ natural extensions:
 - **Physical–digital binding.** Like all provenance systems, the chain trusts
   that the right physical item is scanned at each step. Pairing each product with
   a tamper-evident QR/NFC tag would strengthen this link.
-- **Single admin.** Participant management is centralised in one admin address.
-  A production system could use a multi-signature admin or a DAO/consortium
-  governance model to decentralise onboarding.
+- **Single admin and role mutation.** Participant management is centralised in
+  one admin address, and the admin can change a participant's role by calling
+  `registerParticipant` again. This is acceptable for a prototype because it
+  keeps governance simple, but production should require a multi-signature admin,
+  role-change events/reason codes, and possibly timelocks so role changes are
+  auditable before they affect custody.
+- **Revocation after custody.** Removing a participant prevents future actions,
+  but it does not erase historical custody records. That is intentional: past
+  provenance must remain immutable. A production dApp should display revoked
+  status alongside historical holders so an auditor can distinguish "held at the
+  time" from "still trusted today".
 - **Linear custody.** The lifecycle is a single forward chain. Real supply chains
   can branch (batches split, components assembled); a future version could model
   splits and merges.

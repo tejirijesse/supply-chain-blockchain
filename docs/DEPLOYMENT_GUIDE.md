@@ -223,6 +223,24 @@ Once deployed and verified, the typical flow to demonstrate the solution:
 You can do all of this from the Etherscan **Write Contract** / **Read
 Contract** tabs, or from a dApp/script using ethers.js.
 
+For a scripted Sepolia interaction that produces a transaction hash for
+submission evidence, add these values to `.env` after deployment:
+
+```dotenv
+CONTRACT_ADDRESS="<DEPLOYED_CONTRACT_ADDRESS>"
+PARTICIPANT_ADDRESS="<ADDRESS_TO_REGISTER>"
+PARTICIPANT_ROLE="Manufacturer"
+```
+
+Then run:
+
+```bash
+npm run interact:sepolia
+```
+
+Expected output includes the transaction hash, mined block, gas used, recorded
+role, and Sepolia Etherscan links for the transaction and contract.
+
 For a fast local demonstration without manual contract calls, run:
 
 ```bash
@@ -246,6 +264,7 @@ lifecycle, prints the provenance trail, and shows authenticity checks returning
 | Demo (local) | `npm run demo:local` |
 | Deploy (local) | `npx hardhat run scripts/deploy.js --network hardhat` |
 | Deploy (Sepolia) | `npx hardhat run scripts/deploy.js --network sepolia` |
+| Interact (Sepolia) | `npm run interact:sepolia` |
 | Verify (Sepolia) | `npx hardhat verify --network sepolia <ADDRESS>` |
 
 Convenience npm scripts (see `package.json`) wrap the common commands:
