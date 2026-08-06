@@ -3,6 +3,13 @@
 **A blockchain-based supply-chain provenance and traceability solution for
 Transparency & Trust.**
 
+<p align="center">
+  <a href="https://youtu.be/vUqVnk4y1uI"><img src="https://img.shields.io/badge/Watch_the_demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch the demo"></a>
+  <a href="https://sepolia.etherscan.io/address/0xB3D0D9995ECfe68DAC7DA4D044841B5ba2242F5D"><img src="https://img.shields.io/badge/Sepolia-Live-627EEA?style=for-the-badge&logo=ethereum&logoColor=white" alt="Live on Sepolia"></a>
+  <img src="https://img.shields.io/badge/Solidity-0.8.24-363636?style=for-the-badge&logo=solidity&logoColor=white" alt="Solidity 0.8.24">
+  <img src="https://img.shields.io/badge/tests-29_passing-3fb950?style=for-the-badge" alt="29 tests passing">
+</p>
+
 `SupplyChainRegistry` records product creation, custody transfers, and
 authenticity data on Ethereum. The goal is simple: replace unverifiable
 "trust me" supply-chain claims with a tamper-evident record that buyers,
@@ -41,6 +48,17 @@ Created -> Manufactured -> InTransit -> Delivered -> Sold
    receives the product and marks it sold.
 5. Anyone calls `getProduct`, `getHistory`, or `verifyAuthenticity` to audit the
    result.
+
+## Live deployment
+
+Deployed and exercised end to end on the Ethereum Sepolia testnet.
+
+| | |
+|---|---|
+| Contract | [`0xB3D0D9995ECfe68DAC7DA4D044841B5ba2242F5D`](https://sepolia.etherscan.io/address/0xB3D0D9995ECfe68DAC7DA4D044841B5ba2242F5D) |
+| Network | Sepolia (chain ID `11155111`) |
+| Verified source | [Blockscout](https://eth-sepolia.blockscout.com/address/0xB3D0D9995ECfe68DAC7DA4D044841B5ba2242F5D) · [Sourcify](https://repo.sourcify.dev/11155111/0xB3D0D9995ECfe68DAC7DA4D044841B5ba2242F5D) |
+| Product #1 | "Organic Coffee" walked `Created` → `Sold` across three distinct wallets |
 
 ## Contract highlights
 
@@ -110,4 +128,5 @@ See `docs/DEPLOYMENT_GUIDE.md` for the full step-by-step process.
 - Access control, input validation, lifecycle rules, and event logging included
 - Automated tests cover happy paths, failure paths, and view functions
 - Local deployment and demo scripts provided
+- Deployed on the Ethereum Sepolia testnet with verified source
 - Deployment and presentation documentation included
